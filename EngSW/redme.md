@@ -20,15 +20,14 @@ Segurança vs. Liberdade: Em políticas públicas, aumentar a segurança, como a
 19/08/24: Atividade Java
 Classe Empresa
 
-  package engsw;
-  
-  import java.util.LinkedList;
-  import java.util.List;
-
-  
-  public class Empresa {
-  
-  	private List<Funcionario> funcionarios = new LinkedList<Funcionario>();
+	  package engsw;
+	  
+	  import java.util.LinkedList;
+	  import java.util.List;
+	  
+	  public class Empresa {
+	  
+	  	private List<Funcionario> funcionarios = new LinkedList<Funcionario>();
   	
   	public void cadastrarFuncionario(Funcionario funcionario) {
   		funcionarios.add(funcionario);
@@ -50,13 +49,13 @@ Classe Empresa
 
  Classe Funcionário
  
- package engsw;
-
-  public class Funcionario {
-   private String nome;
-   private String cpf;
-   
-   public Funcionario(String cpf, String nome) {
+	 package engsw;
+	
+	  public class Funcionario {
+	   private String nome;
+	   private String cpf;
+	   
+	   public Funcionario(String cpf, String nome) {
    
     this.cpf = cpf;
    	this.nome = nome;
@@ -73,18 +72,18 @@ Classe Empresa
 
 Classe TesteEmpresa
 
-package engsw;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
-public class TesteEmpresa {
-
-@Test 
-void test() {
-Empresa CeA = new Empresa();
+	package engsw;
+	import static org.junit.jupiter.api.Assertions.*;
+	
+	import java.util.List;
+	
+	import org.junit.jupiter.api.Test;
+	
+	public class TesteEmpresa {
+	
+	@Test 
+	void test() {
+	Empresa CeA = new Empresa();
  
 	Funcionario Tecnica = new Funcionario("43943509855", "Bia");
 	Funcionario Desenvolvedor = new Funcionario("54583098549", "Tiago");
