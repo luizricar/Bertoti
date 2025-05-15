@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🚗 Gerenciador de Carros</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Gerenciador de Carros</h1>
+    <nav>
+      <button onclick="loadCars()">🔄 Atualizar</button>
+      <button onclick="limparInvalidos()">🧹 Limpar Inválidos</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="form-section">
+      <h2>➕ Adicionar Carro</h2>
+      <form id="carForm">
+        <input type="text" id="model" placeholder="Modelo do carro" required />
+        <button type="submit">Adicionar</button>
+      </form>
+    </section>
+
+    <section class="list-section">
+      <h2>📋 Lista de Carros</h2>
+      <ul id="carList"></ul>
+    </section>
+
+    <section class="form-section">
+      <h2>✏️ Editar Carro</h2>
+      <form id="editForm">
+        <input type="text" id="editId" placeholder="ID do carro" required />
+        <input type="text" id="editModel" placeholder="Novo modelo" required />
+        <button type="submit">Atualizar</button>
+      </form>
+    </section>
+
+    <section class="form-section">
+      <h2>❌ Remover Carro</h2>
+      <form onsubmit="deleteCar(); return false;">
+        <input type="text" id="deleteId" placeholder="ID do carro" required />
+        <button type="submit">Remover</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>Feito por Luiz © 2025</p>
+  </footer>
+
+  <script>
+    const API_URL = 'http://localhost:8080/cars';
+
+    async function loadCars() {
+      const res = await fetch(API_URL);
+      const cars = await res.json();
+      const list = document.getElementById('carList');
+      list.innerHTML = '';
+      cars.forEach(car => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span><strong>${car.model}</strong></span>
+          <small>ID: ${car.id}</small>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById('carForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const model = document.getElementById('model').value.trim();
+      if (!model) return;
+
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: crypto.randomUUID(), model })
+      });
+
+      document.getElementById('model').value = '';
+      loadCars();
+    });
+
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editId').value.trim();
+      const model = document.getElementById('editModel').value.trim();
+      if (!id || !model) return;
+
+      await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, model })
+      });
+
+      document.getElementById('editId').value = '';
+      document.getElementById('editModel').value = '';
+      loadCars();
+    });
+
+    async function deleteCar() {
+      const id = document.getElementById('deleteId').value.trim();
+      if (!id) return alert('Informe o ID');
+
+      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      document.getElementById('deleteId').value = '';
+      loadCars();
+    }
+
+    async function limparInvalidos() {
+      await fetch(`${API_URL}/invalidos`, { method: 'DELETE' });
+      loadCars();
+    }
+
+    window.onload = loadCars;
+  </script>
+</body>
+</html>
