@@ -3,7 +3,6 @@ package com.thehecklers.sburrestdemo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.boot.SpringApplication;
@@ -22,19 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 public class SburRestDemoApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(SburRestDemoApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(SburRestDemoApplication.class, args);
+    }
 }
-
 
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/cars")
 class CarController {
-    private List<Car> cars = new ArrayList<>();
+    private final List<Car> cars = new ArrayList<>();
 
     public CarController() {
         cars.addAll(List.of(
@@ -46,89 +42,62 @@ class CarController {
     }
 
     @GetMapping
-    Iterable<Car> getCars() {
+    public List<Car> getCars() {
         return cars;
     }
 
     @GetMapping("/{id}")
-    Optional<Car> getCarById(@PathVariable String id) {
-        for (Car c : cars) {
-            if (c.getId().equals(id)) {
-                return Optional.of(c);
-            }
-        }
-        return Optional.empty();
+    public ResponseEntity<Car> getCarById(@PathVariable String id) {
+        return cars.stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    Car postCar(@RequestBody Car car) {
-        if (car.getId() == null || car.getModel() == null) {
-            throw new IllegalArgumentException("ID e model não podem ser nulos");
+    public ResponseEntity<Car> postCar(@RequestBody Car car) {
+        if (car.getModel() == null || car.getModel().isBlank()) {
+            return ResponseEntity.badRequest().build();
         }
-        cars.add(car);
-        return car;
+
+        Car newCar = new Car(car.getModel());
+        cars.add(newCar);
+        return new ResponseEntity<>(newCar, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Car> putCar(@PathVariable String id, @RequestBody Car car) {
-        int carIndex = -1;
-        
-        for (Car c : cars) {
-            if (c != null && c.getId() != null && c.getId().equals(id)) {
-                carIndex = cars.indexOf(c);
-                cars.set(carIndex, car);
+    public ResponseEntity<Car> putCar(@PathVariable String id, @RequestBody Car car) {
+        if (car.getModel() == null || car.getModel().isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        for (int i = 0; i < cars.size(); i++) {
+            Car existingCar = cars.get(i);
+            if (existingCar != null && existingCar.getId().equals(id)) {
+                existingCar.setModel(car.getModel());
+                return ResponseEntity.ok(existingCar);
             }
         }
-        return (carIndex == -1) ?
-                new ResponseEntity<>(postCar(car), HttpStatus.CREATED) :
-                new ResponseEntity<>(car, HttpStatus.OK);
+
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    void deleteCar(@PathVariable String id) {
-        cars.removeIf(c -> c != null && id.equals(c.getId()));
+    public ResponseEntity<Void> deleteCar(@PathVariable String id) {
+        boolean removed = cars.removeIf(c -> c != null && id.equals(c.getId()));
+        return removed ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
-
-    @DeleteMapping("/limpar")
-void limparCarrosInvalidosENulls() {
-    System.out.println("Antes da limpeza: " + cars.size());
-
-    cars.removeIf(c -> {
-        System.out.println("Verificando: " + c);
-        return c == null || c.getId() == null || c.getModel() == null;
-    });
-
-    System.out.println("Depois da limpeza: " + cars.size());
-    }
-
-    @DeleteMapping("/invalidos")
-void deleteInvalidCars() {
-    System.out.println("Antes da limpeza (de carros inválidos): " + cars.size());
-    
-    // Remove os carros com id ou modelo nulo
-    cars.removeIf(c -> c == null || c.getId() == null || c.getModel() == null);
-
-    System.out.println("Depois da limpeza (de carros inválidos): " + cars.size());
-    }   
-    @DeleteMapping("/remover-null")
-    void removeNullCars() {
-        System.out.println("Antes da limpeza (de objetos null): " + cars.size());
-
-        // Remove qualquer objeto null da lista
-        cars.removeIf(Objects::isNull);
-
-        System.out.println("Depois da limpeza (de objetos null): " + cars.size());
-    }
-
-
 }
 
 class Car {
-    private final String id;
+    private String id;
     private String model;
 
+    public Car() {}
+
     public Car(String id, String model) {
-        this.id = id;
+        this.id = (id == null || id.isBlank()) ? UUID.randomUUID().toString() : id;
         this.model = model;
     }
 
@@ -146,5 +115,18 @@ class Car {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Car)) return false;
+        Car car = (Car) o;
+        return Objects.equals(id, car.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

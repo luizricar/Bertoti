@@ -1,119 +1,193 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🚗 Gerenciador de Carros</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo de Carros</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css/styles.css">
 </head>
 <body>
-  <header>
-    <h1>Gerenciador de Carros</h1>
-    <nav>
-      <button onclick="loadCars()">🔄 Atualizar</button>
-      <button onclick="limparInvalidos()">🧹 Limpar Inválidos</button>
-    </nav>
-  </header>
+  <div class="container">
+    <h1>Catálogo de Carros</h1>
 
-  <main class="container">
-    <section class="form-section">
-      <h2>➕ Adicionar Carro</h2>
-      <form id="carForm">
-        <input type="text" id="model" placeholder="Modelo do carro" required />
-        <button type="submit">Adicionar</button>
-      </form>
-    </section>
+    <div class="car-form">
+      <input type="text" id="modelInput" placeholder="Digite o modelo">
+      <button onclick="addCar()">
+        <span class="material-icons">add</span>
+        Adicionar
+      </button>
+    </div>
 
-    <section class="list-section">
-      <h2>📋 Lista de Carros</h2>
-      <ul id="carList"></ul>
-    </section>
-
-    <section class="form-section">
-      <h2>✏️ Editar Carro</h2>
-      <form id="editForm">
-        <input type="text" id="editId" placeholder="ID do carro" required />
-        <input type="text" id="editModel" placeholder="Novo modelo" required />
-        <button type="submit">Atualizar</button>
-      </form>
-    </section>
-
-    <section class="form-section">
-      <h2>❌ Remover Carro</h2>
-      <form onsubmit="deleteCar(); return false;">
-        <input type="text" id="deleteId" placeholder="ID do carro" required />
-        <button type="submit">Remover</button>
-      </form>
-    </section>
-  </main>
-
-  <footer>
-    <p>Feito por Luiz © 2025</p>
-  </footer>
+    <ul class="car-list" id="carList">
+      <!-- Lista de carros aparece aqui -->
+    </ul>
+  </div>
 
   <script>
-    const API_URL = 'http://localhost:8080/cars';
+    const apiUrl = 'http://localhost:8080/cars';
 
-    async function loadCars() {
-      const res = await fetch(API_URL);
-      const cars = await res.json();
-      const list = document.getElementById('carList');
-      list.innerHTML = '';
-      cars.forEach(car => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <span><strong>${car.model}</strong></span>
-          <small>ID: ${car.id}</small>
-        `;
-        list.appendChild(li);
-      });
+    function loadCars() {
+      fetch(apiUrl)
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById('carList');
+          list.innerHTML = '';
+
+          data.forEach(car => {
+            const li = document.createElement('li');
+            li.className = 'car-item';
+
+            li.innerHTML = `
+              <span>${car.model}</span>
+              <div class="car-actions">
+                <button class="edit" onclick="editCar('${car.id}', '${car.model}')">
+                  <span class="material-icons">edit</span>
+                  Editar
+                </button>
+                <button class="delete" onclick="deleteCar('${car.id}')">
+                  <span class="material-icons">delete</span>
+                  Excluir
+                </button>
+              </div>
+            `;
+
+            list.appendChild(li);
+          });
+        })
+        .catch(error => {
+          console.error('Erro ao carregar carros:', error);
+          document.getElementById('carList').innerHTML = '<p style="color: var(--color-error);">Erro ao carregar dados. Verifique se a API está em execução.</p>';
+        });
     }
 
-    document.getElementById('carForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const model = document.getElementById('model').value.trim();
-      if (!model) return;
+    function addCar() {
+      const input = document.getElementById('modelInput');
+      const model = input.value.trim();
 
-      await fetch(API_URL, {
+      if (model === '') {
+        showNotification('Digite o modelo!', 'error');
+        return;
+      }
+
+      fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: crypto.randomUUID(), model })
+        body: JSON.stringify({ model })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erro ao adicionar carro');
+        }
+        input.value = '';
+        showNotification('Carro adicionado com sucesso!', 'success');
+        loadCars();
+      })
+      .catch(error => {
+        console.error('Erro:', error);
+        showNotification('Erro ao adicionar carro', 'error');
       });
+    }
 
-      document.getElementById('model').value = '';
-      loadCars();
-    });
+    function editCar(id, currentModel) {
+      const newModel = prompt('Editar modelo:', currentModel);
+      if (!newModel || newModel.trim() === '') return;
 
-    document.getElementById('editForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = document.getElementById('editId').value.trim();
-      const model = document.getElementById('editModel').value.trim();
-      if (!id || !model) return;
-
-      await fetch(`${API_URL}/${id}`, {
+      fetch(`${apiUrl}/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, model })
+        body: JSON.stringify({ model: newModel })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erro ao editar carro');
+        }
+        showNotification('Carro atualizado com sucesso!', 'info');
+        loadCars();
+      })
+      .catch(error => {
+        console.error('Erro:', error);
+        showNotification('Erro ao editar carro', 'error');
       });
-
-      document.getElementById('editId').value = '';
-      document.getElementById('editModel').value = '';
-      loadCars();
-    });
-
-    async function deleteCar() {
-      const id = document.getElementById('deleteId').value.trim();
-      if (!id) return alert('Informe o ID');
-
-      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-      document.getElementById('deleteId').value = '';
-      loadCars();
     }
 
-    async function limparInvalidos() {
-      await fetch(`${API_URL}/invalidos`, { method: 'DELETE' });
-      loadCars();
+    function deleteCar(id) {
+      if (!confirm('Deseja excluir este carro?')) return;
+
+      fetch(`${apiUrl}/${id}`, {
+        method: 'DELETE'
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erro ao excluir carro');
+        }
+        showNotification('Carro excluído com sucesso!', 'warning');
+        loadCars();
+      })
+      .catch(error => {
+        console.error('Erro:', error);
+        showNotification('Erro ao excluir carro', 'error');
+      });
     }
+
+    function showNotification(message, type) {
+      // Criar elemento de notificação
+      const notification = document.createElement('div');
+      notification.textContent = message;
+      notification.style.position = 'fixed';
+      notification.style.bottom = '20px';
+      notification.style.right = '20px';
+      notification.style.padding = '12px 20px';
+      notification.style.borderRadius = '8px';
+      notification.style.fontWeight = 'bold';
+      notification.style.zIndex = '1000';
+      notification.style.animation = 'fadeIn 0.3s, fadeOut 0.3s 2.7s';
+      
+      // Definir cor com base no tipo
+      switch(type) {
+        case 'success':
+          notification.style.backgroundColor = 'var(--color-success)';
+          break;
+        case 'error':
+          notification.style.backgroundColor = 'var(--color-error)';
+          break;
+        case 'warning':
+          notification.style.backgroundColor = 'var(--color-warning)';
+          notification.style.color = '#333';
+          break;
+        case 'info':
+          notification.style.backgroundColor = 'var(--color-info)';
+          break;
+        default:
+          notification.style.backgroundColor = 'var(--color-primary)';
+      }
+      
+      notification.style.color = type === 'warning' ? '#333' : 'white';
+      
+      // Adicionar ao corpo do documento
+      document.body.appendChild(notification);
+      
+      // Remover após 3 segundos
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 3000);
+    }
+
+    // Adicionar estilos para animações de notificação
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes fadeOut {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(20px); }
+      }
+    `;
+    document.head.appendChild(style);
 
     window.onload = loadCars;
   </script>
