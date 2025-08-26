@@ -15,21 +15,24 @@ Em 2025-1
 O desafio foi criar um sistema de ponto eletrônico, proposto pela Altave uma empresa especializada em monitoramento inteligente por meio de videomonitoramento e inteligência artificial para diversos setores, como Defesa e Segurança, Energia, Mineração, Portos, Agronegócio e Óleo e Gás.
 A solução que entregamos foi um sistema web, onde o usuário pode visualizar empresas terceirizadas que estão cadastradas e consequentimente seus funcionários, cargos, fotos, pontos batidos, carga horária contratada e alguns indicadores de absenteísmo, quantidades de funcionários ativos, inativos e horas trabalhadas.
 
-Fale sobre o projeto desenvolvido. Apresente a empresa parceira, o problema e a solução entregue pela equipe (mínimo de um parágrafo por item). Recomenda-se o uso de figuras (ou até mesmo vídeos) para ilustrar os principais projetos.
-
-GIT
+GIT: https://github.com/Vortek-API/Parent
 
 Tecnologias Utilizadas
-Apresente brevemente as tecnologias utilizadas. Uma tecnologia por linha. Indique qual a importância de cada tecnologia para o projeto.
+Neste proejeto, utilizamos Java para criar toda a lógica e conexões do backend, excenciais para o funcionamento do projeto.
+Angular para a interface frontend, necessária para que o usuário pudesse interagir com o sistema de forma amigável e intuitiva.
+MySQL no banco de dados, aqui foram geradas e armazenadas todas a tabelas modeladas para nosso sistema. Os dados armazenados são os que alimentam nosso painel gráfico de indicadores.
 
 Contribuições Pessoais
-Apresente suas contribuições no projeto. Foque nas funcionalidades em que você mais atuou. Descreva sua atuação em detalhes, especificando que tecnologias você utilizou.
+Neste projeto contribui na criação de endpoints para o cadastro de funcionários e também com a criação de telas do frontend para o cadastro e edição de funcionários.
 
 Hard Skills
-Apresente as hard skills que você utilizou/desenvolveu durante o projeto e o nível de proficiência alcançado. Exemplo: CSS - Sei fazer com autonomia
+Java, utilização de springboot para criação dos endpoints - nível iniciante.
+Angular, criação das telas de cadastro e edição de funcionários, utilizando html, css e javascript - nível iniciante.
 
 Soft Skills
-Apresente as soft skills que você utilizou/desenvolveu durante o projeto e em quais situações elas foram fundamentais. Exemplo: Comunicação - Precisei exercitar minhas habilidades de comunicação para viabilizar as reuniões semanais levando em conta as disponibilidades dos membros, que não cursavam as mesmas disciplinas.
+Adaptabilidade e comunicação - por ser um grupo novo, o desenvolvimento dessas habilidades foram excenciais para uma comunicação acertiva com o grupo durante as reuniões semanais e o processo de desenvolvimento. Foram habilidades que aprimorei e conseguiram fazer com que minha interação com o grupo também melhorasse.
+
+
 
 Em 2022-1
 Mesmo formato
