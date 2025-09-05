@@ -1,0 +1,41 @@
+classDiagram
+    direction TB
+
+    class OperacaoStrategy {
+        <<interface>>
+        +executar(a:int, b:int) int
+    }
+
+    class Soma {
+        +executar(a:int, b:int) int
+    }
+
+    class Subtracao {
+        +executar(a:int, b:int) int
+    }
+
+    class Multiplicacao {
+        +executar(a:int, b:int) int
+    }
+
+    class Divisao {
+        +executar(a:int, b:int) int
+    }
+
+    class Calculadora {
+        -estrategia: OperacaoStrategy
+        +setEstrategia(e: OperacaoStrategy) void
+        +executarOperacao(a:int, b:int) int
+    }
+
+    class Main {
+        +main(args:String[]) void
+    }
+
+    OperacaoStrategy <|.. Soma
+    OperacaoStrategy <|.. Subtracao
+    OperacaoStrategy <|.. Multiplicacao
+    OperacaoStrategy <|.. Divisao
+
+    Calculadora --> OperacaoStrategy
+    Main --> Calculadora
