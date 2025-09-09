@@ -1,0 +1,62 @@
+// Observer
+interface Observer {
+    void update(String mensagem);
+}
+
+// Concrete Observers
+class Usuario implements Observer {
+    private String nome;
+
+    public Usuario(String nome) {
+        this.nome = nome;
+    }
+
+    @Override
+    public void update(String mensagem) {
+        System.out.println(nome + " recebeu a notificação: " + mensagem);
+    }
+}
+
+// Subject (observável)
+interface Subject {
+    void adicionarObserver(Observer o);
+    void removerObserver(Observer o);
+    void notificarObservers(String mensagem);
+}
+
+// Concrete Subject
+class CanalNoticias implements Subject {
+    private List<Observer> observers = new ArrayList<>();
+
+    @Override
+    public void adicionarObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removerObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notificarObservers(String mensagem) {
+        for (Observer o : observers) {
+            o.update(mensagem);
+        }
+    }
+}
+
+// Teste
+public class Main {
+    public static void main(String[] args) {
+        CanalNoticias canal = new CanalNoticias();
+
+        Usuario u1 = new Usuario("Luiz");
+        Usuario u2 = new Usuario("Maria");
+
+        canal.adicionarObserver(u1);
+        canal.adicionarObserver(u2);
+
+        canal.notificarObservers("Nova notícia disponível!");
+    }
+}
