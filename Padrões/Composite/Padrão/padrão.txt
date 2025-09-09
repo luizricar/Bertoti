@@ -1,0 +1,69 @@
+import java.util.ArrayList;
+import java.util.List;
+
+// Component
+interface ArquivoComponente {
+    void mostrar();
+}
+
+// Leaf
+class Arquivo implements ArquivoComponente {
+    private String nome;
+
+    public Arquivo(String nome) {
+        this.nome = nome;
+    }
+
+    @Override
+    public void mostrar() {
+        System.out.println("Arquivo: " + nome);
+    }
+}
+
+// Composite
+class Pasta implements ArquivoComponente {
+    private String nome;
+    private List<ArquivoComponente> itens = new ArrayList<>();
+
+    public Pasta(String nome) {
+        this.nome = nome;
+    }
+
+    public void adicionar(ArquivoComponente componente) {
+        itens.add(componente);
+    }
+
+    public void remover(ArquivoComponente componente) {
+        itens.remove(componente);
+    }
+
+    @Override
+    public void mostrar() {
+        System.out.println("📁 Pasta: " + nome);
+        for (ArquivoComponente item : itens) {
+            item.mostrar();
+        }
+    }
+}
+
+// Teste
+public class Main {
+    public static void main(String[] args) {
+        ArquivoComponente arq1 = new Arquivo("foto.png");
+        ArquivoComponente arq2 = new Arquivo("documento.pdf");
+        ArquivoComponente arq3 = new Arquivo("musica.mp3");
+
+        Pasta pasta1 = new Pasta("Downloads");
+        pasta1.adicionar(arq1);
+        pasta1.adicionar(arq2);
+
+        Pasta pasta2 = new Pasta("Músicas");
+        pasta2.adicionar(arq3);
+
+        Pasta raiz = new Pasta("Meu Computador");
+        raiz.adicionar(pasta1);
+        raiz.adicionar(pasta2);
+
+        raiz.mostrar();
+    }
+}
