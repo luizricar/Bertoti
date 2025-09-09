@@ -1,0 +1,37 @@
+class Usuario {
+    private String nome;
+
+    public Usuario(String nome) {
+        this.nome = nome;
+    }
+
+    public void receberNotificacao(String mensagem) {
+        System.out.println(nome + " recebeu a notificação: " + mensagem);
+    }
+}
+
+class CanalNoticiasAntipattern {
+    private Usuario u1;
+    private Usuario u2;
+
+    public CanalNoticiasAntipattern(Usuario u1, Usuario u2) {
+        this.u1 = u1;
+        this.u2 = u2;
+    }
+
+    public void novaNoticia(String mensagem) {
+        u1.receberNotificacao(mensagem);
+        u2.receberNotificacao(mensagem);
+    }
+}
+
+// Teste
+public class MainAntipattern {
+    public static void main(String[] args) {
+        Usuario u1 = new Usuario("Luiz");
+        Usuario u2 = new Usuario("Maria");
+
+        CanalNoticiasAntipattern canal = new CanalNoticiasAntipattern(u1, u2);
+        canal.novaNoticia("Nova notícia disponível!");
+    }
+}
