@@ -1,0 +1,54 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class Item {
+    private String nome;
+    private boolean ehPasta;
+    private List<Item> filhos = new ArrayList<>();
+
+    public Item(String nome, boolean ehPasta) {
+        this.nome = nome;
+        this.ehPasta = ehPasta;
+    }
+
+    public void adicionar(Item item) {
+        if (ehPasta) {
+            filhos.add(item);
+        } else {
+            System.out.println("Não é possível adicionar itens dentro de um arquivo!");
+        }
+    }
+
+    public void mostrar() {
+        if (ehPasta) {
+            System.out.println("📁 Pasta: " + nome);
+            for (Item filho : filhos) {
+                filho.mostrar();
+            }
+        } else {
+            System.out.println("Arquivo: " + nome);
+        }
+    }
+}
+
+// Teste
+public class MainAntipattern {
+    public static void main(String[] args) {
+        Item pastaRaiz = new Item("Meu Computador", true);
+        Item pastaDownloads = new Item("Downloads", true);
+        Item pastaMusicas = new Item("Músicas", true);
+
+        Item arq1 = new Item("foto.png", false);
+        Item arq2 = new Item("documento.pdf", false);
+        Item arq3 = new Item("musica.mp3", false);
+
+        pastaDownloads.adicionar(arq1);
+        pastaDownloads.adicionar(arq2);
+        pastaMusicas.adicionar(arq3);
+
+        pastaRaiz.adicionar(pastaDownloads);
+        pastaRaiz.adicionar(pastaMusicas);
+
+        pastaRaiz.mostrar();
+    }
+}
